@@ -134,71 +134,7 @@
     </div>
 
 
-        <div class="col-md-12 col-sm-12">
 
-        <fieldset name="optional-details">
-
-            <x-form-legend>
-                <a id="optional_info">
-                    <x-icon type="caret-right" class="fa-fw" id="optional_info_icon" />
-                    {{ trans('admin/hardware/form.optional_infos') }}
-                </a>
-            </x-form-legend>
-
-            <div id="optional_details" class="col-md-12" style="display:none">
-                @include ('partials.forms.edit.name', ['translated_name' => trans('admin/hardware/form.name')])
-                @include ('partials.forms.edit.warranty')
-                @include ('partials.forms.edit.datepicker', ['translated_name' => trans('admin/hardware/form.expected_checkin'),'fieldname' => 'expected_checkin'])
-                @include ('partials.forms.edit.datepicker', ['translated_name' => trans('general.next_audit_date'),'fieldname' => 'next_audit_date', 'help_text' => trans('general.next_audit_date_help')])
-                <!-- byod checkbox -->
-                <div class="form-group byod">
-                    <div class="col-md-7 col-md-offset-3">
-                        <label class="form-control">
-                            <input type="checkbox" value="1" name="byod" {{ (old('remote', $item->byod)) == '1' ? ' checked="checked"' : '' }} aria-label="byod">
-                            {{ trans('general.byod') }}
-                        </label>
-                        <p class="help-block">
-                            {{ trans('general.byod_help') }}
-                        </p>
-                    </div>
-                </div>
-
-            </div> <!-- end optional details -->
-        </fieldset>
-
-        </div><!-- end col-md-12 col-sm-12-->
-
-
-
-        <div class="col-md-12 col-sm-12">
-            <fieldset name="order-info">
-                <x-form-legend>
-                    <a id="order_info">
-                        <x-icon type="caret-right" class="fa-fw" id="order_info_icon" />
-                        {{ trans('admin/hardware/form.order_details') }}
-                    </a>
-                </x-form-legend>
-
-                <div id='order_details' class="col-md-12" style="display:none">
-                    @include ('partials.forms.edit.order_number')
-                    @include ('partials.forms.edit.datepicker', ['translated_name' => trans('general.purchase_date'),'fieldname' => 'purchase_date'])
-                    @include ('partials.forms.edit.datepicker', ['translated_name' => trans('admin/hardware/form.eol_date'),'fieldname' => 'asset_eol_date'])
-                    @include ('partials.forms.edit.supplier-select', ['translated_name' => trans('general.supplier'), 'fieldname' => 'supplier_id'])
-
-                    @php
-                        $currency_type = null;
-                        if ($item->id && $item->location) {
-                            $currency_type = $item->location->currency;
-                        }
-                    @endphp
-
-                    @include ('partials.forms.edit.purchase_cost', ['currency_type' => $currency_type])
-
-                </div> <!-- end order details -->
-            </fieldset>
-        </div><!-- end col-md-12 col-sm-12-->
-    </div><!-- end col-md-12 col-sm-12-->
-    </div><!-- end col-md-12 col-sm-12-->
    
 @stop
 
@@ -400,37 +336,7 @@
 
         });
 
-        {{-- TODO: Clean up some of the duplication in here. Not too high of a priority since we only copied it once. --}}
-        $("#optional_info").on("click",function(){
-            $('#optional_details').fadeToggle(100);
-            $('#optional_info_icon').toggleClass('fa-caret-right fa-caret-down');
-            var optional_info_open = $('#optional_info_icon').hasClass('fa-caret-down');
-            document.cookie = "optional_info_open="+optional_info_open+'; path=/';
-        });
 
-        $("#order_info").on("click",function(){
-            $('#order_details').fadeToggle(100);
-            $("#order_info_icon").toggleClass('fa-caret-right fa-caret-down');
-            var order_info_open = $('#order_info_icon').hasClass('fa-caret-down');
-            document.cookie = "order_info_open="+order_info_open+'; path=/';
-        });
-
-        var all_cookies = document.cookie.split(';')
-        for(var i in all_cookies) {
-            var trimmed_cookie = all_cookies[i].trim(' ')
-            if (trimmed_cookie.startsWith('optional_info_open=')) {
-                elems = all_cookies[i].split('=', 2)
-                if (elems[1] == 'true') {
-                    $('#optional_info').trigger('click')
-                }
-            }
-            if (trimmed_cookie.startsWith('order_info_open=')) {
-                elems = all_cookies[i].split('=', 2)
-                if (elems[1] == 'true') {
-                    $('#order_info').trigger('click')
-                }
-            }
-        }
 
     });
 
