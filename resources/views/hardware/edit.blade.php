@@ -415,22 +415,11 @@
             document.cookie = "order_info_open="+order_info_open+'; path=/';
         });
 
-        var all_cookies = document.cookie.split(';')
-        for(var i in all_cookies) {
-            var trimmed_cookie = all_cookies[i].trim(' ')
-            if (trimmed_cookie.startsWith('optional_info_open=')) {
-                elems = all_cookies[i].split('=', 2)
-                if (elems[1] == 'true') {
-                    $('#optional_info').trigger('click')
-                }
-            }
-            if (trimmed_cookie.startsWith('order_info_open=')) {
-                elems = all_cookies[i].split('=', 2)
-                if (elems[1] == 'true') {
-                    $('#order_info').trigger('click')
-                }
-            }
-        }
+        // 强制默认闭合状态，忽略cookie中的设置
+        $('#optional_info_icon').removeClass('fa-caret-down').addClass('fa-caret-right');
+        $('#order_info_icon').removeClass('fa-caret-down').addClass('fa-caret-right');
+        $('#optional_details').hide();
+        $('#order_details').hide();
 
     });
 
