@@ -74,6 +74,10 @@ class CheckoutAssetNotification extends Notification
             $notifyBy[] = MicrosoftTeamsChannel::class;
         }
 
+        if (Setting::getSettings()->webhook_selected === 'feishu' && Setting::getSettings()->webhook_endpoint) {
+
+            $notifyBy[] = 'feishu';
+        }
 
         if (Setting::getSettings()->webhook_selected === 'slack' || Setting::getSettings()->webhook_selected === 'general' ) {
 
@@ -175,5 +179,41 @@ public function toGoogleChat()
                     )
             );
 
+    }
+
+    public function toFeishu()
+    {
+        $target = $this->target;
+        $admin = $this->admin;
+        $item = $this->item;
+        $note = $this->note;
+
+        $text = trans('mail.Asset_Checkout_Notification', ['tag' => '']) . "\n";
+        $text .= trans('general.to_user') . ": " . $target->display_name . "\n";
+        $text .= trans('general.by_user') . ": " . $admin->display_name . "\n";
+        $text .= trans('general.asset') . ": " . htmlspecialchars_decode($item->display_name) . "\n";
+        
+        if ($item->location) {
+            $text .= trans('general.location') . ": " . $item->location->name . "\n";
+        }
+
+        if ($item->company) {
+            $text .= trans('general.company') . ": " . $item->company->name . "\n";
+        }
+
+        if (($this->expected_checkin) && ($this->expected_checkin !== '')) {
+            $text .= trans('general.expected_checkin') . ": " . $this->expected_checkin . "\n";
+        }
+
+        if ($note) {
+            $text .= trans('mail.notes') . ": " . $note . "\n";
+        }
+
+        return [
+            'msg_type' => 'text',
+            'content' => [
+                'text' => $text
+            ]
+        ];
     }
 }

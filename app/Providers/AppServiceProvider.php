@@ -76,6 +76,11 @@ class AppServiceProvider extends ServiceProvider
         Consumable::observe(ConsumableObserver::class);
         License::observe(LicenseObserver::class);
         Setting::observe(SettingObserver::class);
+
+        // Register Feishu channel
+        $this->app->make('Illuminate\Notifications\ChannelManager')->extend('feishu', function ($app) {
+            return new \App\Channels\FeishuChannel();
+        });
     }
 
     /**

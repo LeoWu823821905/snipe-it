@@ -67,6 +67,13 @@ class SlackSettingsForm extends Component
                 "link" => "https://support.microsoft.com/en-us/office/create-incoming-webhooks-with-workflows-for-microsoft-teams-8ae491c7-0394-4861-ba59-055e33f75498",
                 "test" => "msTeamTestWebhook"
             ),
+            "feishu" => array(
+                "name" => "飞书",
+                "icon" => "fa-solid fa-feather",
+                "placeholder" => "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx",
+                "link" => "https://open.feishu.cn/community/articles/7271149634339422210",
+                "test" => "feishuWebhookTest"
+            ),
         ];
 
         $this->setting = Setting::getSettings();
@@ -82,7 +89,7 @@ class SlackSettingsForm extends Component
         $this->webhook_botname = $this->setting->webhook_botname;
         $this->webhook_options = $this->setting->webhook_selected;
         $this->teams_webhook_deprecated = !Str::contains($this->webhook_endpoint, 'workflows');
-        if($this->webhook_selected === 'microsoft' || $this->webhook_selected === 'google'){
+        if($this->webhook_selected === 'microsoft' || $this->webhook_selected === 'google' || $this->webhook_selected === 'feishu'){
             $this->webhook_channel = '#NA';
         }
 
@@ -110,7 +117,7 @@ class SlackSettingsForm extends Component
             $this->isDisabled= '';
             $this->save_button = trans('general.save');
         }
-        if($this->webhook_selected == 'microsoft' || $this->webhook_selected == 'google'){
+        if($this->webhook_selected == 'microsoft' || $this->webhook_selected == 'google' || $this->webhook_selected == 'feishu'){
             $this->webhook_channel = '#NA';
         }
     }
@@ -289,4 +296,36 @@ class SlackSettingsForm extends Component
 
          return session()->flash('error' , trans('admin/settings/message.webhook.error_misc'));
      }
+
+    public function feishuWebhookTest(){
+
+        $payload = [
+            "msg_type" => "text",
+            "content" => [
+                "text" => trans('general.webhook_test_msg', ['app' => $this->webhook_name])
+            ]
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                'content-type' => 'application/json',
+            ])->post($this->webhook_endpoint,
+                $payload)->throw();
+
+
+            if (($response->getStatusCode() == 302) || ($response->getStatusCode() == 301)) {
+                return session()->flash('error', trans('admin/settings/message.webhook.error_redirect', ['endpoint' => $this->webhook_endpoint]));
+            }
+
+            $this->isDisabled='';
+            $this->save_button = trans('general.save');
+            return session()->flash('success' , trans('admin/settings/message.webhook.success', ['webhook_name' => $this->webhook_name]));
+
+        } catch (\Exception $e) {
+
+            $this->isDisabled='disabled';
+            $this->save_button = trans('admin/settings/general.webhook_presave');
+            return session()->flash('error' , trans('admin/settings/message.webhook.error', ['error_message' => $e->getMessage(), 'app' => $this->webhook_name]));
+        }
+    }
 }

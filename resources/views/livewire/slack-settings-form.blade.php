@@ -69,7 +69,7 @@
                                 <x-input.select
                                     name="webhook_selected"
                                     id="select2"
-                                    :options="['slack' => trans('admin/settings/general.slack'), 'general' => trans('admin/settings/general.general_webhook'),'google' => trans('admin/settings/general.google_workspaces'), 'microsoft' => trans('admin/settings/general.ms_teams')]"
+                                    :options="['slack' => trans('admin/settings/general.slack'), 'general' => trans('admin/settings/general.general_webhook'),'google' => trans('admin/settings/general.google_workspaces'), 'microsoft' => trans('admin/settings/general.ms_teams'), 'feishu' => '飞书']"
                                     :selected="old('webhook_selected', $webhook_selected)"
                                     :disabled="Helper::isDemoMode()"
                                     :for-livewire="true"
