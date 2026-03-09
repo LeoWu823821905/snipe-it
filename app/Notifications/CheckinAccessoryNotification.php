@@ -56,6 +56,11 @@ class CheckinAccessoryNotification extends Notification
             $notifyBy[] = MicrosoftTeamsChannel::class;
         }
 
+        if (Setting::getSettings()->webhook_selected == 'feishu' && Setting::getSettings()->webhook_endpoint) {
+
+            $notifyBy[] = 'feishu';
+        }
+
         if (Setting::getSettings()->webhook_selected == 'slack' || Setting::getSettings()->webhook_selected == 'general' ) {
             $notifyBy[] = SlackWebhookChannel::class;
         }
@@ -149,5 +154,38 @@ class CheckinAccessoryNotification extends Notification
                     )
             );
 
+    }
+
+    public function toFeishu()
+    {
+        $target = $this->target;
+        $admin = $this->admin;
+        $item = $this->item;
+        $note = $this->note;
+
+        $text = trans('mail.Accessory_Checkin_Notification') . "\n";
+        $text .= trans('general.from') . ": " . $target->display_name . "\n";
+        $text .= trans('general.by') . ": " . $admin->display_name . "\n";
+        $text .= trans('general.accessory') . ": " . htmlspecialchars_decode($item->display_name) . "\n";
+        $text .= trans('admin/consumables/general.remaining') . ": " . $item->numRemaining() . "\n";
+        
+        if ($item->location) {
+            $text .= trans('general.location') . ": " . $item->location->name . "\n";
+        }
+
+        if ($item->company) {
+            $text .= trans('general.company') . ": " . $item->company->name . "\n";
+        }
+
+        if ($note) {
+            $text .= trans('mail.notes') . ": " . $note . "\n";
+        }
+
+        return [
+            'msg_type' => 'text',
+            'content' => [
+                'text' => $text
+            ]
+        ];
     }
 }

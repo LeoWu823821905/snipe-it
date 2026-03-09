@@ -270,6 +270,18 @@ class Setting extends Model
     }
 
     /**
+     * Get the Feishu webhook endpoint from configuration.
+     *
+     * @return string
+     */
+    public function routeNotificationForFeishu(): ?string
+    {
+        // At this point the endpoint is the same for everything.
+        //  In the future this may want to be adapted for individual notifications.
+        return self::getSettings()->webhook_endpoint;
+    }
+
+    /**
      * Get the password complexity rule.
      *
      * @return string

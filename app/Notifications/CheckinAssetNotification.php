@@ -62,6 +62,12 @@ class CheckinAssetNotification extends Notification
 
             $notifyBy[] = MicrosoftTeamsChannel::class;
         }
+
+        if (Setting::getSettings()->webhook_selected == 'feishu' && Setting::getSettings()->webhook_endpoint) {
+
+            $notifyBy[] = 'feishu';
+        }
+
         if (Setting::getSettings()->webhook_selected == 'slack' || Setting::getSettings()->webhook_selected == 'general' ) {
             Log::debug('use webhook');
             $notifyBy[] = SlackWebhookChannel::class;
@@ -159,5 +165,36 @@ class CheckinAssetNotification extends Notification
                         )
                     )
             );
+    }
+
+    public function toFeishu()
+    {
+        $admin = $this->admin;
+        $item = $this->item;
+        $note = $this->note;
+
+        $text = trans('mail.Asset_Checkin_Notification', ['tag' => '']) . "\n";
+        $text .= trans('general.administrator') . ": " . $admin->display_name . "\n";
+        $text .= trans('general.asset') . ": " . htmlspecialchars_decode($item->display_name) . "\n";
+        $text .= trans('general.status') . ": " . $item->assetstatus?->name . "\n";
+        
+        if ($item->location) {
+            $text .= trans('general.location') . ": " . $item->location->name . "\n";
+        }
+
+        if ($item->company) {
+            $text .= trans('general.company') . ": " . $item->company->name . "\n";
+        }
+
+        if ($note) {
+            $text .= trans('mail.notes') . ": " . $note . "\n";
+        }
+
+        return [
+            'msg_type' => 'text',
+            'content' => [
+                'text' => $text
+            ]
+        ];
     }
 }

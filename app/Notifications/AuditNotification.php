@@ -64,6 +64,10 @@ class AuditNotification extends Notification
             Log::debug('using google webhook');
             $notifyBy[] = GoogleChatChannel::class;
         }
+        if (Setting::getSettings()->webhook_selected == 'feishu' && Setting::getSettings()->webhook_endpoint) {
+
+            $notifyBy[] = 'feishu';
+        }
         return $notifyBy;
     }
 
@@ -149,5 +153,32 @@ class AuditNotification extends Notification
                         )
                     )
             );
+    }
+
+    public function toFeishu()
+    {
+        $item      = $this->params['item']  ?? null;
+        $admin_user = $this->params['admin'] ?? null;
+        $note      = $this->params['note']  ?? '';
+        $location  = $this->params['location'] ?? '';
+
+        $text = class_basename(get_class($item)) . ' ' . trans('general.audited') . "\n";
+        $text .= trans('general.audited_by') . ": " . $admin_user->display_name . "\n";
+        $text .= trans('general.item') . ": " . htmlspecialchars_decode($item->display_name) . "\n";
+        
+        if ($note) {
+            $text .= trans('mail.notes') . ": " . $note . "\n";
+        }
+
+        if ($location) {
+            $text .= trans('general.location') . ": " . $location . "\n";
+        }
+
+        return [
+            'msg_type' => 'text',
+            'content' => [
+                'text' => $text
+            ]
+        ];
     }
 }
